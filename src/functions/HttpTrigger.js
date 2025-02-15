@@ -10,9 +10,9 @@ app.http('HTTPTrigger', {
     
     // 定义要检查的 URL 列表（可根据实际情况修改或从请求中获取）
     const urlList = [
-      "https://example1.com",
-      "https://example2.com",
-      "https://example3.com"
+      "https://www.google.ca",
+      "https://www.bing.com",
+      "https://www.yahoo.com"
     ];
 
     // 使用 Durable Functions 客户端启动编排

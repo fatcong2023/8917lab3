@@ -3,7 +3,7 @@ const { app } = require('@azure/functions');
 
 app.serviceBusQueue('ServiceBusQueueTrigger', {
   connection: 'ServiceBusConnection', // 请确保该环境变量已配置好 Service Bus 连接字符串
-  queueName: 'myqueue', // 与上面 activity 中的队列名称保持一致
+  queueName: 'lab3', // 与上面 activity 中的队列名称保持一致
   handler: async (context, message) => {
     context.log("ServiceBusQueueTrigger 收到消息：", message);
     
