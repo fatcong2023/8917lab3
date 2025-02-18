@@ -1,7 +1,8 @@
 // CheckUrlStatus/index.js
 const { app } = require('@azure/functions');
+const df = require("durable-functions");
 
-app.activity("CheckUrlStatus", {
+df.app.activity("CheckUrlStatus", {
   handler: async (url, context) => {
     context.log(`开始检查 URL: ${url}`);
     try {

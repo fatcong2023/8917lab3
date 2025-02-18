@@ -1,12 +1,13 @@
 // DurableFanOutInTrigger/index.js
 const df = require("durable-functions");
 
-df.app.orchestration("DurableFanOutInTrigger", function* (context) {
+df.app.orchestration("DFO", function* (context) {
   // 从输入中获取 URL 列表
   const input = context.df.getInput();
   const urls = input.urls;
   const tasks = [];
   
+  console.log(input);
   // Fan-out：为每个 URL 调用 CheckUrlStatus Activity 函数
   for (const url of urls) {
     tasks.push(context.df.callActivity("CheckUrlStatus", url));
