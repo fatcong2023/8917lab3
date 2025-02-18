@@ -1,23 +1,31 @@
-// DurableFanOutInTrigger/index.js
 const df = require("durable-functions");
 
 df.app.orchestration("DFO", function* (context) {
-  // 从输入中获取 URL 列表
   const input = context.df.getInput();
+  
+
+  context.log("CONTEXT input:", context);
+  // Debug log the input
+  context.log("Orchestrator input:", input);
+
+  // Validate input
+  if (!input || !Array.isArray(input.urls)) {
+    throw new Error("Input must be an object with a 'urls' property that is an array");
+  }
+  
   const urls = input.urls;
   const tasks = [];
   
-  console.log(input);
-  // Fan-out：为每个 URL 调用 CheckUrlStatus Activity 函数
+  // Fan-out: call CheckUrlStatus activity for each URL
   for (const url of urls) {
     tasks.push(context.df.callActivity("CheckUrlStatus", url));
   }
   
-  // Fan-in：等待所有 Activity 函数返回结果
+  // Fan-in: wait for all activity tasks to complete
   const results = yield context.df.Task.all(tasks);
   context.log("所有 URL 检查结果：", results);
   
-  // 调用 Activity 函数，将结果发送到 Service Bus 队列
+  // Call activity to send results to Service Bus
   yield context.df.callActivity("SendStatusToServiceBus", results);
   
   return results;
