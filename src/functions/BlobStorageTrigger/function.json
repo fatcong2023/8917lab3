@@ -1,0 +1,13 @@
+{
+    "bindings": [
+      {
+        "name": "blob",
+        "type": "blobTrigger",
+        "direction": "in",
+        "path": "lab3/{name}",
+        "connection": "AzureWebJobsStorage"
+      }
+    ],
+    "scriptFile": "index.js"
+  }
+  

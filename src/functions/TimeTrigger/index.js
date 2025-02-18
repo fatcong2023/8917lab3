@@ -2,10 +2,8 @@
 const { app } = require('@azure/functions');
 
 app.timer('TimeTrigger', {
-  // 每天午夜运行一次（可根据需要调整 Cron 表达式）
-  schedule: '*/5 * * * * *',
   handler: async (context) => {
-    console.log('TimeTrigger 触发，调用 HTTPTrigger。');
+    console.log('TimeTrigger activated，calling HTTPTrigger。');
     const httpTriggerUrl = process.env.HTTP_TRIGGER_URI;
     if (!httpTriggerUrl) {
         console.log('Error HTTP_TRIGGER_URI not configured');

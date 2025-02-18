@@ -5,6 +5,7 @@ const { app } = require('@azure/functions');
 app.http('HTTPTrigger', {
   methods: ['POST'],
   authLevel: 'anonymous',
+  extraInputs: [df.input.durableClient()],
   handler: async (request, context) => {
     context.log('HTTPTrigger 收到请求。');
     
@@ -17,7 +18,7 @@ app.http('HTTPTrigger', {
 
     // 使用 Durable Functions 客户端启动编排
     const client = df.getClient(context);
-    const instanceId = await client.startNew("DurableFanOutInTrigger", { urls: urlList });
+    const instanceId = await client.startNew("DFO", undefined, { urls: urlList });
     context.log(`启动编排函数，实例 ID = ${instanceId}`);
     
     return client.createCheckStatusResponse(request, instanceId);
