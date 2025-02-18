@@ -1,19 +1,18 @@
-// CheckUrlStatus/index.js
 const { app } = require('@azure/functions');
 const df = require("durable-functions");
 
 df.app.activity("CheckUrlStatus", {
   handler: async (url, context) => {
-    context.log(`开始检查 URL: ${url}`);
+    console.log(`Starting URL check: ${url}`);
     try {
       const response = await fetch(url, { method: 'GET' });
       if (response.ok) {
-        return `URL ${url} 状态正常 (状态码: ${response.status})`;
+        return `URL ${url} is healthy (status code: ${response.status})`;
       } else {
-        return `URL ${url} 返回错误状态 ${response.status}`;
+        return `URL ${url} returned error status ${response.status}`;
       }
     } catch (error) {
-      return `URL ${url} 检查失败：${error.message}`;
+      return `URL ${url} check failed: ${error.message}`;
     }
   }
 });

@@ -7,7 +7,7 @@ app.http('HTTPTrigger', {
   authLevel: 'anonymous',
   extraInputs: [df.input.durableClient()],
   handler: async (request, context) => {
-    context.log('HTTPTrigger Received a request');
+    console.log('HTTPTrigger Received a request');
     
     const urlList = [
       "https://www.google.ca",
@@ -17,8 +17,10 @@ app.http('HTTPTrigger', {
 
     // 使用 Durable Functions 客户端启动编排
     const client = df.getClient(context);
-    const instanceId = await client.startNew("DFO", undefined, JSON.stringify({ urls: urlList }));
-    context.log(`启动编排函数，实例 ID = ${instanceId}`);
+    // console.log('HttpTrigger Context', context);
+    console.log('Input being passed to orchestration:', { urls: urlList });
+    const instanceId = await client.startNew("DFO", undefined,"{ urls: urlList }");
+    console.log(`get instanceID ID = ${instanceId}`);
     
     return client.createCheckStatusResponse(request, instanceId);
   }

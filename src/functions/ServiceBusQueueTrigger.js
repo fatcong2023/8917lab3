@@ -1,19 +1,41 @@
-// ServiceBusQueueTrigger/index.js
 const { app } = require('@azure/functions');
+const { BlobServiceClient } = require('@azure/storage-blob');
+const { v4: uuidv4 } = require('uuid'); // For generating unique blob names
 
 app.serviceBusQueue('ServiceBusQueueTrigger', {
-  connection: 'ServiceBusConnection', // 请确保该环境变量已配置好 Service Bus 连接字符串
-  queueName: 'lab3', // 与上面 activity 中的队列名称保持一致
+  connection: 'ServiceBusConnection',
+  queueName: 'lab3',
   handler: async (context, message) => {
-    context.log("ServiceBusQueueTrigger 收到消息：", message);
-    
-    // 将消息转换为文本格式报告
-    const reportContent = typeof message === 'object'
-      ? JSON.stringify(message, null, 2)
-      : message.toString();
-    
-    // 输出绑定：将报告内容上传到 Blob 存储（绑定名称 outputBlob 应在 function.json 中配置）
-    context.bindings.outputBlob = reportContent;
-    context.log("报告通过输出绑定上传到 Blob 存储。");
+    console.log("full context ", context);
+    // console.log("ServiceBusQueueTrigger received message:", message);
+
+    // Convert the message to a text format report
+    const reportContent = typeof context === 'object'
+      ? JSON.stringify(context, null, 2)
+      : context.toString();
+
+    // Use the Azure Blob Storage SDK to upload the report
+    try {
+      const connectionString = process.env.AzureWebJobsStorage;
+      const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
+
+      // Get a container client (this container must exist or you can create it)
+      const containerName = 'reports';
+      const containerClient = blobServiceClient.getContainerClient(containerName);
+      // Create the container if it doesn't exist
+      await containerClient.createIfNotExists();
+
+      // Generate a unique blob name
+      const blobName = `${uuidv4()}.txt`;
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+      // Upload the report content to the blob
+      await blockBlobClient.upload(reportContent, Buffer.byteLength(reportContent));
+
+      console.log(`Report uploaded to Blob Storage as: ${blobName}`);
+    } catch (error) {
+      console.error("Error uploading to Blob Storage:", error);
+      throw error;
+    }
   }
 });

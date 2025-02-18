@@ -2,18 +2,20 @@ const df = require("durable-functions");
 
 df.app.orchestration("DFO", function* (context) {
   const input = context.df.getInput();
-  
-
-  context.log("CONTEXT input:", context);
-  // Debug log the input
-  context.log("Orchestrator input:", input);
+  const inputRaw = context.df.getInput();
+  console.log("Orchestrator received raw input:", inputRaw);
 
   // Validate input
   if (!input || !Array.isArray(input.urls)) {
-    throw new Error("Input must be an object with a 'urls' property that is an array");
+    var urls = [
+      "https://www.google.ca",
+      "https://www.bing.com",
+      "https://www.yahoo.com"
+    ];
+  } else {
+    urls = input.urls;
   }
   
-  const urls = input.urls;
   const tasks = [];
   
   // Fan-out: call CheckUrlStatus activity for each URL
@@ -23,7 +25,7 @@ df.app.orchestration("DFO", function* (context) {
   
   // Fan-in: wait for all activity tasks to complete
   const results = yield context.df.Task.all(tasks);
-  context.log("所有 URL 检查结果：", results);
+  console.log("All results: ", results);
   
   // Call activity to send results to Service Bus
   yield context.df.callActivity("SendStatusToServiceBus", results);
